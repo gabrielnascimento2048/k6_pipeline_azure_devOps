@@ -1,0 +1,31 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+name: k6 Test Pipeline
+
+trigger:
+  branches:
+    include:
+      - main
+
+stages:
+  - stage: Test
+    displayName: Test Stage
+    jobs:
+      - job: k6Test
+        displayName: Run k6 tests
+        pool:
+          vmImage: 'ubuntu-latest'
+
+        steps:
+          - checkout: self
+
+          - script: |
+              docker run -i --rm \
+                -v $(System.DefaultWorkingDirectory):/mnt \
+                -e K6_TEST_URL=http://sua-url-de-teste.com \
+                -e K6_VUS=$(VUS) \
+                -e K6_DURATION=$(DURATION) \
+                loadimpact/k6 run /mnt/main.js
